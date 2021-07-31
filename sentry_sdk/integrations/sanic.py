@@ -86,9 +86,10 @@ class SanicIntegration(Integration):
                     scope.clear_breadcrumbs()
                     scope.add_event_processor(_make_request_processor(weak_request))
 
-                response = old_handle_request(self, request, *args, **kwargs)
-                if isawaitable(response):
-                    response = await response
+                async with hub.start_transaction():
+                    response = old_handle_request(self, request, *args, **kwargs)
+                    if isawaitable(response):
+                        response = await response
 
                 return response
 
